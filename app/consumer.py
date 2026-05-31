@@ -15,13 +15,14 @@ def process_message(ch, method, properties, body):
         message = json.loads(body)
         tipo = message["tipo"]
         contenido = message["contenido"]
-        fase = message["fase"]
+        session_id = message["sessionId"]
 
-        publish_result({"tipo": "FASE", "contenido": contenido, "fase": fase})
+        print(f">>> Mensaje recibido — tipo: {tipo}, sessionId: {session_id}")
 
         if tipo in ("EXITO", "ERROR"):
             texto_bonito = generate_message({"tipo": tipo, "contenido": contenido})
-            publish_result({"tipo": "MENSAJE_BONITO", "contenido": texto_bonito, "fase": fase + 1})
+            publish_result({"tipo": "MENSAJE_BONITO", "contenido": texto_bonito, "sessionId": session_id})
+            print(f">>> Resultado publicado en cola.resultados — sessionId: {session_id}")
 
         ch.basic_ack(delivery_tag=method.delivery_tag)
     except Exception as e:
@@ -33,5 +34,7 @@ def start_consuming():
     conn = get_connection()
     channel = get_channel(conn)
     channel.basic_qos(prefetch_count=1)
+    print(f">>> Registrando consumer en cola: {repr(QUEUE_RECIBIDOS)}")
     channel.basic_consume(queue=QUEUE_RECIBIDOS, on_message_callback=process_message)
+    print(f">>> Consumer registrado. Iniciando start_consuming...")
     channel.start_consuming()
