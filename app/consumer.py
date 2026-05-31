@@ -22,6 +22,7 @@ def process_message(ch, method, properties, body):
         if tipo in ("EXITO", "ERROR"):
             texto_bonito = generate_message({"tipo": tipo, "contenido": contenido})
             publish_result({"tipo": "MENSAJE_BONITO", "contenido": texto_bonito, "sessionId": session_id})
+            print(f">>> Mensaje generado: {texto_bonito}")
             print(f">>> Resultado publicado en cola.resultados — sessionId: {session_id}")
 
         ch.basic_ack(delivery_tag=method.delivery_tag)
