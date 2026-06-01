@@ -8,6 +8,9 @@ from app.groq_client import generate_message
 load_dotenv()
 
 QUEUE_RECIBIDOS = os.getenv("QUEUE_RECIBIDOS", "cola.recibidos")
+TOTAL_FASES = 5
+
+_contadores = {}
 
 
 def process_message(ch, method, properties, body):
@@ -18,15 +21,19 @@ def process_message(ch, method, properties, body):
         session_id = message["sessionId"]
         transaction_id = message["transactionId"]
 
-        print(f">>> Mensaje recibido — tipo: {tipo}, sessionId: {session_id}")
+        _contadores[transaction_id] = _contadores.get(transaction_id, 0) + 1
+        fase = _contadores[transaction_id]
 
-        if tipo == "INFO":
+        print(f">>> Mensaje recibido — fase: {fase}/{TOTAL_FASES}, tipo: {tipo}, sessionId: {session_id}")
+
+        if fase < TOTAL_FASES:
             publish_result({"tipo": tipo, "contenido": contenido, "sessionId": session_id, "transactionId": transaction_id})
-            print(f">>> Fase INFO reenviada — sessionId: {session_id}")
-        elif tipo in ("EXITO", "ERROR"):
+            print(f">>> Fase {fase} reenviada — sessionId: {session_id}")
+        else:
             texto_bonito = generate_message({"tipo": tipo, "contenido": contenido})
             publish_result({"tipo": tipo, "contenido": texto_bonito, "sessionId": session_id, "transactionId": transaction_id})
-            print(f">>> Mensaje bonito publicado — sessionId: {session_id}")
+            print(f">>> Fase 5 (mensaje bonito) publicada — sessionId: {session_id}")
+            del _contadores[transaction_id]
 
         ch.basic_ack(delivery_tag=method.delivery_tag)
     except Exception as e:

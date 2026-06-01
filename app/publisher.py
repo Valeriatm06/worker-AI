@@ -12,10 +12,12 @@ QUEUE_RESULTADOS = os.getenv("QUEUE_RESULTADOS", "cola.resultados")
 def publish_result(message: dict):
     conn = get_connection()
     channel = get_channel(conn)
+    payload = json.dumps(message)
+    print(f">>> [cola.resultados] Publicando: {payload}")
     channel.basic_publish(
         exchange="",
         routing_key=QUEUE_RESULTADOS,
-        body=json.dumps(message),
+        body=payload,
         properties=pika.BasicProperties(delivery_mode=2),
     )
     conn.close()
