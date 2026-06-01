@@ -16,14 +16,17 @@ def process_message(ch, method, properties, body):
         tipo = message["tipo"]
         contenido = message["contenido"]
         session_id = message["sessionId"]
+        transaction_id = message["transactionId"]
 
         print(f">>> Mensaje recibido — tipo: {tipo}, sessionId: {session_id}")
 
-        if tipo in ("EXITO", "ERROR"):
+        if tipo == "INFO":
+            publish_result({"tipo": tipo, "contenido": contenido, "sessionId": session_id, "transactionId": transaction_id})
+            print(f">>> Fase INFO reenviada — sessionId: {session_id}")
+        elif tipo in ("EXITO", "ERROR"):
             texto_bonito = generate_message({"tipo": tipo, "contenido": contenido})
-            publish_result({"tipo": "MENSAJE_BONITO", "contenido": texto_bonito, "sessionId": session_id})
-            print(f">>> Mensaje generado: {texto_bonito}")
-            print(f">>> Resultado publicado en cola.resultados — sessionId: {session_id}")
+            publish_result({"tipo": tipo, "contenido": texto_bonito, "sessionId": session_id, "transactionId": transaction_id})
+            print(f">>> Mensaje bonito publicado — sessionId: {session_id}")
 
         ch.basic_ack(delivery_tag=method.delivery_tag)
     except Exception as e:
