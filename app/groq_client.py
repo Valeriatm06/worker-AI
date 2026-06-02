@@ -1,6 +1,8 @@
 import os
+import time
 from groq import Groq
 from dotenv import load_dotenv
+from app.logger import log
 
 load_dotenv()
 
@@ -25,11 +27,24 @@ def generate_message(fase: dict) -> str:
         f"Resultado técnico: {contenido}"
     )
 
-    response = _client.chat.completions.create(
-        model=GROQ_MODEL,
-        messages=[{"role": "user", "content": prompt}],
-    )
-    return response.choices[0].message.content.strip()
+    log("INFO", "llm_request", "groq_client", f"Enviando prompt al modelo {GROQ_MODEL}, tipo: {tipo}")
+    start = time.perf_counter()
+    try:
+        response = _client.chat.completions.create(
+            model=GROQ_MODEL,
+            messages=[{"role": "user", "content": prompt}],
+        )
+        duration = int((time.perf_counter() - start) * 1000)
+        log("INFO", "llm_response", "groq_client",
+            "Respuesta recibida del LLM",
+            status="SUCCESS", duration_ms=duration)
+        return response.choices[0].message.content.strip()
+    except Exception as e:
+        duration = int((time.perf_counter() - start) * 1000)
+        log("ERROR", "llm_error", "groq_client",
+            "Error al llamar al LLM",
+            status="FAILED", duration_ms=duration, exc=e)
+        raise
 
 
 if __name__ == "__main__":
