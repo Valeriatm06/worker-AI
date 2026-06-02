@@ -17,14 +17,18 @@ def generate_message(fase: dict) -> str:
     contenido = fase["contenido"]
 
     if tipo == "EXITO":
-        tone_instruction = "El tono debe ser celebratorio y cálido."
+        tone_instruction = (
+            "El tono debe ser celebratorio y entusiasta. "
+            "Menciona el evento y la categoría de forma natural, como si le hablaras a un fan emocionado."
+        )
     else:
-        tone_instruction = "El tono debe ser empático y sugerir intentar de nuevo."
+        tone_instruction = "El tono debe ser empático y tranquilizador, animando al usuario a intentarlo de nuevo."
 
     prompt = (
-        f"Transforma el siguiente resultado técnico de un pago en un mensaje empático "
-        f"y amigable para el usuario, en máximo 2 oraciones en español. {tone_instruction}\n\n"
-        f"Resultado técnico: {contenido}"
+        f"Eres el asistente de una plataforma de venta de boletos para eventos (conciertos, partidos, teatro, etc.). "
+        f"Convierte el siguiente mensaje del sistema en una notificación amigable para el comprador, "
+        f"en máximo 2 oraciones en español. {tone_instruction}\n\n"
+        f"Mensaje del sistema: {contenido}"
     )
 
     log("INFO", "llm_request", "groq_client", f"Enviando prompt al modelo {GROQ_MODEL}, tipo: {tipo}")
