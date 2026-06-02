@@ -1,4 +1,4 @@
-# Worker IA — EnVivo
+imp# Worker IA — EnVivo
 
 Worker en Python que consume mensajes de resultados de pago desde RabbitMQ, genera un mensaje empático usando la API de Groq (LLM) y publica el resultado en otra cola para ser entregado al frontend.
 
