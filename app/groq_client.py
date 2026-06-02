@@ -49,7 +49,7 @@ def generate_message(fase: dict) -> str:
 
 if __name__ == "__main__":
     result_exito = generate_message({"tipo": "EXITO", "contenido": "Pago procesado correctamente. Transacción ID: 12345."})
-    print("EXITO:", result_exito)
+    log("INFO", "llm_test_result", "groq_client", f"EXITO: {result_exito}", status="SUCCESS")
 
     result_error = generate_message({"tipo": "ERROR", "contenido": "Fondos insuficientes en la cuenta."})
-    print("ERROR:", result_error)
+    log("INFO", "llm_test_result", "groq_client", f"ERROR: {result_error}", status="SUCCESS")

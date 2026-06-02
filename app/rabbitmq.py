@@ -1,6 +1,7 @@
 import os
 import pika
 from dotenv import load_dotenv
+from app.logger import log
 
 load_dotenv()
 
@@ -34,6 +35,6 @@ if __name__ == "__main__":
         conn = get_connection()
         get_channel(conn)
         conn.close()
-        print("RabbitMQ connection successful")
+        log("INFO", "rabbitmq_connection_test", "rabbitmq", "RabbitMQ connection successful", status="SUCCESS")
     except Exception as e:
-        print(f"Connection failed: {e}")
+        log("ERROR", "rabbitmq_connection_test", "rabbitmq", "Connection failed", status="FAILED", exc=e)
